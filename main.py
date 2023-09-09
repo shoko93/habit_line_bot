@@ -21,6 +21,8 @@ from linebot.v3.webhooks import (
     TextMessageContent
 )
 
+import openai
+
 load_dotenv()
 
 configuration = Configuration(access_token=os.environ['CHANNEL_ACCESS_TOKEN'])
@@ -40,10 +42,11 @@ async def callback(request: Request, x_line_signature=Header(None)):
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_message(event):
     with ApiClient(configuration) as api_client:
+        completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": event.message.text}])
         line_bot_api = MessagingApi(api_client)
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
-                messages=[TextMessage(text=event.message.text)]
+                messages=[TextMessage(text=completion.choices[0].message.content)]
             )
         )
