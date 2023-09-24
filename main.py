@@ -33,6 +33,10 @@ handler = WebhookHandler(os.environ['CHANNEL_SECRET'])
 
 app = FastAPI()
 
+@app.get("/")
+def index():
+  return 'OK'
+
 @app.post("/callback")
 async def callback(request: Request, x_line_signature=Header(None)):
     body = await request.body()
